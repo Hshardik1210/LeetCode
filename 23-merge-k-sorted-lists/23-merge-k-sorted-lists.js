@@ -51,24 +51,15 @@ var merge2Lists = function (list1,list2) {
 var mergeKLists = function(lists) {
     if(lists.length == 0)
         return null
-    
-    let l=0
-    let r=lists.length-1
-    
-    while(l<r) {
-        lists[l] = merge2Lists(lists[l],lists[r])
-        lists.pop()
-        l++
-        r--
-        if(l>=r) {
-            l=0
-            r=lists.length-1
+    while (lists.length!=1) {
+        let l=0
+        let r=lists.length-1
+        while(l<r) {
+            lists[l] = merge2Lists(lists[l],lists[r])
+            lists.pop()
+            l++
+            r--
         }
-    }
-    
-    if(r<l &&lists.length==2) {
-        lists[0] = merge2Lists(lists[0],lists[1])
-        lists.pop()
     }
     return lists[0]
 }
