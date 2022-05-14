@@ -22,8 +22,7 @@ class Solution
         if (i >= 0 && i < r && j >= 0 && j < c && grid[i][j] == '1')
         {
             grid[i][j] = '0';
-            for (int k = 0; k < allowedDirections; k++)
-            {
+            for (int k = 0; k < allowedDirections; k++) {
                 dfs(grid, i + directions[k][0], j + directions[k][1]);
             }
         }
@@ -35,8 +34,7 @@ class Solution
         int c = grid[0].size();
 
         queue<pair<int, int>> q;
-        q.push({ x,
-            y });
+        q.push({ x, y });
         while (!q.empty())
         {
             int i = q.front().first;
@@ -45,8 +43,7 @@ class Solution
             if (i >= 0 && i < r && j >= 0 && j < c && grid[i][j] == '1')
             {
                 grid[i][j] = '0';
-                for (int k = 0; k < allowedDirections; k++)
-                {
+                for (int k = 0; k < allowedDirections; k++) {
                     q.push({ i + directions[k][0], j + directions[k][1] });
                 }
             }
@@ -64,7 +61,7 @@ class Solution
             {
                 if (grid[i][j] == '1')
                 {
-                    bfs(grid, i, j);
+                    dfs(grid, i, j);
                     count++;
                 }
             }
