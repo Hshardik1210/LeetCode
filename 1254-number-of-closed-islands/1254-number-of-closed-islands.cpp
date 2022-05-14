@@ -21,12 +21,10 @@ public:
             grid[i][j]=1;
             bool result = true;
 
-            bool top   = isSurrounded(grid, i - 1, j);
-            bool down  = isSurrounded(grid, i + 1, j);
-            bool left  = isSurrounded(grid, i, j - 1);
-            bool right = isSurrounded(grid, i, j + 1);
-        
-            return top && down && left && right;
+            for(int k=0;k<allowedDirections;k++) {
+                result = isSurrounded(grid, i+directions[k][0], j+directions[k][1]) && result;
+            }
+            return result;
         }
         return false;
     }
