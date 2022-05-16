@@ -34,7 +34,7 @@ public:
                 if (m.find(s[i]) != m.end())
                 {
                     m[s[i]]++;
-                    if (m[s[i]] ==1)
+                    if (m[s[i]] == 1)
                         count++;
                 }
                 i++;
