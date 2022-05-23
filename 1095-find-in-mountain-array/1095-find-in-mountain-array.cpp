@@ -10,66 +10,56 @@
 
 class Solution {
 public:
-   int peakIndex(MountainArray &mountainArr) {
-        int s = 0;
-        int e = mountainArr.length() - 1;
-        int mid = s + (e - s)/2;
-        while(s < e)
-        {
-            if(mountainArr.get(mid) > mountainArr.get(mid+1)) //you are in decreasing part
-                e = mid;
-            else if(mountainArr.get(mid) < mountainArr.get(mid+1)) //you are in increasing part
-                s = mid + 1;
-            mid = s + (e - s)/2;
+    int indexOfMaxElement(MountainArray &mountainArr) {
+        int low = 1;
+        int high = mountainArr.length()-2;
+
+        while(low<=high) {
+            int mid = low + (high - low) / 2;
+            if(mountainArr.get(mid)>mountainArr.get(mid+1) && mountainArr.get(mid)>mountainArr.get(mid-1))
+                return mid;
+            else if (mountainArr.get(mid)>mountainArr.get(mid-1))
+                low = mid + 1;
+            else
+                high = mid - 1;
         }
-        return s;
+        return -1;
     }
-    
-    int orderAgnosticBinarysearch(MountainArray &mountainArr, int target, int s, int e)
-    {
-        if(mountainArr.get(e) > mountainArr.get(s))
-        {
-            int mid = s + (e - s)/2;
-            while(s <= e)
-            {
-                if(mountainArr.get(mid) == target)
-                    return mid;
-                else if(mountainArr.get(mid) < target)
-                    s = mid + 1;
-                else 
-                    e = mid - 1;
-                mid = s + (e - s)/2;
-                
+
+    int binarySearch(MountainArray &mountainArr, int target, int low, int high, bool increasingOrder) {
+        while(low<=high) {
+            int mid = low + (high -low) / 2;
+            if (mountainArr.get(mid)==target)
+                return mid;
+            else if (mountainArr.get(mid) > target) {
+                if(increasingOrder)
+                    high = mid - 1;
+                else
+                    low = mid + 1;
             }
-            return -1;
-        }
-        else
-        {
-            int mid = s + (e - s)/2;
-            while(s <= e)
-            {
-                if(mountainArr.get(mid) == target)
-                    return mid;
-                else if(mountainArr.get(mid) < target)
-                    e = mid - 1;
-                else 
-                    s = mid + 1;
-                mid = s + (e - s)/2;
-                
+            else {
+                if (increasingOrder)
+                    low = mid + 1;
+                else
+                    high = mid - 1;
             }
-            return -1;            
         }
+        return -1;
     }
 
 
-int findInMountainArray(int target, MountainArray &mountainArr) {
-        int peak = peakIndex(mountainArr);
-        int firstTry = orderAgnosticBinarysearch(mountainArr, target, 0, peak);
-        if(firstTry != -1)
-            return firstTry;
-        else
-            return orderAgnosticBinarysearch(mountainArr, target, peak+1, mountainArr.length() - 1);
+    int findInMountainArray(int target, MountainArray &mountainArr) {
+        int maxElementIndex = indexOfMaxElement(mountainArr);
+        if(maxElementIndex!=-1 && target == mountainArr.get(maxElementIndex))
+            return maxElementIndex;
+
+        if (maxElementIndex!=-1) {
+            int leftSearch = binarySearch(mountainArr, target, 0, maxElementIndex-1, true);
+            if (leftSearch!=-1)
+                return leftSearch;
+
+            return binarySearch(mountainArr, target, maxElementIndex+1, mountainArr.length() -1, false);
+        }
+        return -1;
     }
-    
-    
 };
