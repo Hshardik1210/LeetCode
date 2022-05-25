@@ -1,33 +1,49 @@
-class comparator
-{
-    public:
-        bool operator()(pair<int, int> &a, pair<int, int> &b)
-        {
-            if (a.first == b.first)
-                return a.second < b.second;
-            return a.first < b.first;
-        }
-};
+
 
 class Solution
 {
     public:
+    
+    int FloorIndex(vector<int>&arr, int target) {
+        int low = 0;
+        int high = arr.size()-1;
+        int floorIndex = -1;
+        while(low<=high) {
+            int mid = low + (high - low) / 2;
+            if (arr[mid] == target)
+                return mid;
+            if (arr[mid]<target) {
+                floorIndex = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return floorIndex;
+    }
         vector<int> findClosestElements(vector<int> &arr, int k, int x)
         {
-            priority_queue<pair<int, int>, vector< pair<int, int>>, comparator> pq;
-            for (int i = 0; i < arr.size(); i++)
-            {
-                pq.push({ abs(arr[i] - x),
-                    arr[i] });
-                if (pq.size() > k)
-                    pq.pop();
+            int n = arr.size();
+            int floorIndex = FloorIndex(arr, x);
+            int left = floorIndex;
+            int right = floorIndex+1;
+            vector<int>result;
+            while (left>=0 && right<n && result.size()<k) {
+                if (abs(arr[left]-x) > abs(arr[right]-x)) {
+                    result.push_back(arr[right++]);
+                } else {
+                    result.push_back(arr[left--]);
+                }
             }
-            vector<int> result;
-            while (k--)
-            {
-                result.push_back(pq.top().second);
-                pq.pop();
+            
+            while (left>=0 && result.size()<k) {
+                result.push_back(arr[left--]);
             }
+            
+            while (right<n && result.size()<k) {
+                result.push_back(arr[right++]);
+            }
+            
             sort(result.begin(), result.end());
             return result;
         }
