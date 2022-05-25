@@ -1,22 +1,25 @@
+class comparator {
+    public:
+    bool operator() (pair<int,int>&a, pair<int,int>&b) {
+        return b.first>a.first;
+    }
+};
+
 class Solution {
 public:
     vector<vector<int>> kClosest(vector<vector<int>>& points, int k) {
-        priority_queue<pair<int, int>> maxPQ;
+        priority_queue<pair<int, int>, vector<pair<int,int>>, comparator> maxPQ;
         for (int i = 0 ; i < points.size(); i++) {
-            pair<int, int> entry = {squaredDistance(points[i]), i};
-            if (maxPQ.size() < k) {
-                maxPQ.push(entry);
-            } else if (entry.first < maxPQ.top().first) {
+            maxPQ.push({squaredDistance(points[i]), i});
+            if (maxPQ.size() > k)
                 maxPQ.pop();
-                maxPQ.push(entry);
-            }
         }
         
         vector<vector<int>> answer;
-        while (!maxPQ.empty()) {
+        while (k--) {
             int entryIndex = maxPQ.top().second;
-            maxPQ.pop();
             answer.push_back(points[entryIndex]);
+            maxPQ.pop();
         }
         return answer;
     }
