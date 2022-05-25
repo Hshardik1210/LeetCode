@@ -1,5 +1,3 @@
-
-
 class Solution
 {
     public:
@@ -48,3 +46,5 @@ class Solution
             return result;
         }
 };
+
+// O (log(n) + k)
