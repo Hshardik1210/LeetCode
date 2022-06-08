@@ -2,11 +2,11 @@ class Solution
 {
     public:
 
-        void adjacencyList(vector<int> adj[], int u, int v)
-        {
-            adj[u].push_back(v);
-            adj[v].push_back(u);
-        }
+    void adjacencyList(vector<int> adj[], int u, int v)
+    {
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
 
     bool bfs(vector<int> adj[], int n, vector<bool> &visited, int source, int destination)
     {
@@ -60,12 +60,15 @@ class Solution
         }
 
         vector<bool> visited(n, false);
+        bool bfsApproach = false;
+        if (bfsApproach)
+            return bfs(adj, n, visited, source, destination);
 
-        // for (int i = 0; i < n; i++)
-        //     if (visited[i] == false)
-        //         if (dfs(adj, n, visited, source, destination))
-        //             return true;
+        for (int i = 0; i < n; i++)
+            if (visited[i] == false)
+                if (dfs(adj, n, visited, source, destination))
+                    return true;
 
-        return bfs(adj, n, visited, source, destination);
+        return false;
     }
 };
