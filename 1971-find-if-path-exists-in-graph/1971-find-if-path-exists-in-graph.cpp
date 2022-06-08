@@ -61,11 +61,11 @@ class Solution
 
         vector<bool> visited(n, false);
 
-        for (int i = 0; i < n; i++)
-            if (visited[i] == false)
-                if (dfs(adj, n, visited, source, destination))
-                    return true;
+        // for (int i = 0; i < n; i++)
+        //     if (visited[i] == false)
+        //         if (dfs(adj, n, visited, source, destination))
+        //             return true;
 
-        return false;
+        return bfs(adj, n, visited, source, destination);
     }
 };
