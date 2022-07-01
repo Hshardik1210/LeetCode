@@ -2,3 +2,5 @@ https://leetcode.com/discuss/interview-question/object-oriented-design/1550957/S
 https://github.com/TheTechGranth/thegranths/tree/master/src/main/java/SystemDesign
 
 https://www.educative.io/courses/grokking-the-object-oriented-design-interview
+
+https://aaronice.gitbook.io/lintcode/data_structure/design-tic-tac-toe
