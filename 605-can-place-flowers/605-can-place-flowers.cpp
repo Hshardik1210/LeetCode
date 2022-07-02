@@ -3,6 +3,8 @@ class Solution
     public:
         bool canPlaceFlowers(vector<int> &flowerbed, int n)
         {
+            if(n==0)
+                return true;
             int count = 0;
             for (int i = 0; i < flowerbed.size(); i++)
             {
@@ -21,6 +23,6 @@ class Solution
                     }
                 }
             }
-            return count >= n;
+            return false;
         }
 };
