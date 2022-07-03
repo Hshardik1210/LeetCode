@@ -42,7 +42,8 @@ class Solution
             }
 
             int minimum = INT_MAX;
-            for (int c: costs[n - 1]) {
+            for (int c: costs[n - 1])
+            {
                 minimum = min(minimum, c);
             }
             return minimum;
