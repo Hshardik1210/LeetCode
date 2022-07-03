@@ -1,38 +1,50 @@
 class Solution
 {
     public:
-        int minCostII(vector<vector < int>> &houses)
+        int minCostII(vector<vector < int>> &costs)
         {
-            int n = houses.size();
-            int k = houses[0].size();
-            for (int i = 1; i < n; i++)
+            if (costs.size() == 0) return 0;
+            int k = costs[0].size();
+            int n = costs.size();
+
+            for (int house = 1; house < n; house++)
             {
-                            int prevMin1Index = -1;
-            int prevMin2Index = -1;
-                for (int j = 0; j < k; j++)
+
+               	// Find the minimum and second minimum color in the PREVIOUS row.
+                int minColorIndex = -1;
+                int secondMinColorIndex = -1;
+                for (int color = 0; color < k; color++)
                 {
-                    if (prevMin1Index == -1 || houses[i - 1][j] < houses[i - 1][prevMin1Index])
+                    int cost = costs[house - 1][color];
+                    if (minColorIndex == -1 || cost < costs[house - 1][minColorIndex])
                     {
-                        prevMin2Index = prevMin1Index;
-                        prevMin1Index = j;
+                        secondMinColorIndex = minColorIndex;
+                        minColorIndex = color;
                     }
-                    else if (prevMin2Index == -1 || houses[i - 1][j] < houses[i - 1][prevMin2Index])
-                        prevMin2Index = j;
+                    else if (secondMinColorIndex == -1 || cost < costs[house - 1][secondMinColorIndex])
+                    {
+                        secondMinColorIndex = color;
+                    }
                 }
 
-                for (int j = 0; j < houses[0].size(); j++)
+               	// And now calculate the new costs for the current row.
+                for (int color = 0; color < k; color++)
                 {
-                    if (j == prevMin1Index)
-                        houses[i][j] = houses[i][j] + houses[i - 1][prevMin2Index];
+                    if (color == minColorIndex)
+                    {
+                        costs[house][color] += costs[house - 1][secondMinColorIndex];
+                    }
                     else
-                        houses[i][j] = houses[i][j] + houses[i - 1][prevMin1Index];
+                    {
+                        costs[house][color] += costs[house - 1][minColorIndex];
+                    }
                 }
             }
-            
-        int minimum = INT_MAX;
-        for (int c : houses[n - 1]) {
-            minimum = min(minimum, c);
-        }
+
+            int minimum = INT_MAX;
+            for (int c: costs[n - 1]) {
+                minimum = min(minimum, c);
+            }
             return minimum;
         }
 };
