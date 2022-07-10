@@ -1,0 +1,367 @@
+create table consumer
+(
+cid number(6) primary key,
+cname varchar2(20),
+age number(3),
+dob date,
+pno number(10),
+address varchar(25),
+city varchar(15),
+pincode number(6)
+);
+
+create table meter
+(
+mid number(6) primary key,
+c_idm number(6),
+current_reading number,
+previous_reading number,
+foreign key(c_idm) references consumer(cid)
+);
+
+create table amount
+(
+bid number(7) primary key,
+c_ida number(6),
+m_id number(6),
+units number,
+amount number,
+due number,
+last_date date,
+status char(6),
+foreign key(m_id) references meter(mid),
+foreign key(c_ida) references consumer(cid)
+);
+
+a) create procedure to Add new consumer. Take all detail as input from user.
+b) create a procedure to display consumer details in proper format where consumer id is taken as input.
+c) create a procedure to generate the bill of consumer where consumer id,previous reading,current reading,last date is taken asinput.
+d) create a procedure to show bill of consumer where consumer id is taken as input.
+e) create a procedure for payment of bill where consumer id and amount is taken as input.
+f) create a procedure to delete a record of consumer where consumer id is taken as input.
+g)create a trigger to auto generate bill number and store in amount table.
+h)create trigger for mobile no. so that mobile no. should be of 10 digit.
+i)create trigger for date of birth cannot exceed present date correct choice.
+j)create trigger for age should not be less than 18 to be a consumer.
+
+
+a) create procedure to Add new consumer. Take all detail as input from user.
+
+declare
+billno number(7);
+cno consumer.cid%type;
+name consumer.cname%type; 
+ag consumer.age%type;
+birthdate consumer.dob%type;
+ph consumer.pno%type; 
+add consumer.address%type;
+ct consumer.city%type;
+pin number;
+meterno meter.mid%type;
+begin
+cno:=&cno;
+name := '&name';
+birthdate:='&birthdate';
+ph := &ph;
+add := '&add'; 
+ct := '&ct'; 
+pin := &pin;
+meterno:= &meterno;
+ag:=round((sysdate-birthdate)/365);
+insert into consumer values (cno, name,ag, birthdate, ph, add, ct, pin);
+insert into meter values (meterno,cno,0,0);
+insert into amount values (billno,cno,meterno,0,0,0,null,null);
+end; 
+/
+111
+hardik
+12-oct-2018
+9179084472
+1110 a sudama nagar
+indore
+452009
+568
+
+b) create a procedure to display consumer details in proper format where consumer id is taken as input.
+
+create or replace procedure showconsumer
+as
+	cno consumer.cid%type; 
+	name consumer.cname%type; 
+	ag consumer.age%type;
+	birth consumer.dob%type;
+	mobile consumer.pno%type; 
+	add consumer.address%type;
+	ct consumer.city%type;
+	pin number;	
+begin
+	cno:=&cno;
+	select cname,dob, age, pno, address,city,pincode into name,birth,ag,mobile,add,ct,pin
+	from consumer where consumer.cid = cno;
+	
+	dbms_output.put_line('================================'); 
+	dbms_output.put_line('consumer details'); 
+	dbms_output.put_line('================================'); 
+	dbms_output.put_line('consumer no	: '||cno); 
+	dbms_output.put_line('consumer name	: '||name);
+	dbms_output.put_line('consumer age	: '||ag); 
+	dbms_output.put_line('date of birth	: '||birth);
+	dbms_output.put_line('contact no.	: '||mobile); 
+	dbms_output.put_line('address		: '||add);  
+	dbms_output.put_line('city		: '||ct); 
+	dbms_output.put_line('pincode		: '||pin); 
+	dbms_output.put_line('================================'); 
+end; 
+/
+111
+exec showconsumer;
+
+c) create a procedure to generate the bill of consumer where consumer id,previous reading,current reading,last date is taken as input.
+
+create or replace procedure genbill
+as
+id consumer.cid%type;
+cr meter.current_reading%type;
+pr meter.previous_reading%type;
+ld amount.last_date%type;
+c number;
+m number;
+amt number;
+unt number;
+begin
+id:=&id;
+pr:= &pr;
+cr:= &cr;
+ld:= '&ld';
+			unt:=cr-pr;
+			
+			if unt<15 then
+				amt:=150;
+			else
+				amt:=unt*7;
+			end if;
+	select count(*) into c from consumer where cid = id;
+      	if c>0 then
+      	begin
+            	select count(*) into m from meter where c_idm = id;
+		if m>0 then
+            		begin
+                		update meter set current_reading=cr,previous_reading=pr where c_idm=id;
+				update amount set units=unt,amount=amt,due=amt,status='n',last_date=ld where c_ida=id; 
+	      		end;
+		else
+			dbms_output.put_line('meter id not found');
+		end if;
+	end;
+	else 
+		dbms_output.put_line('consumer id not found');
+	end if;
+end;
+/
+111
+0
+59
+27-apr-2017
+exec genbill;
+
+
+d) create a procedure to show bill of consumer where consumer id is taken as input.
+
+create or replace procedure showbill
+as
+id consumer.cid%type;
+bno number(7);
+cno consumer.cid%type;
+name consumer.cname%type;
+add consumer.address%type;
+ct consumer.city%type;
+pin consumer.city%type;
+meterno meter.mid%type;
+cr meter.current_reading%type;
+pr meter.previous_reading%type;
+ld amount.last_date%type;
+unt amount.units%type;
+amt number;
+c number;
+m number;
+begin
+id:=&id;
+	select count(*) into c from consumer where cid = id;
+      if c>0 then
+      begin
+            select count(*) into m from amount where c_ida = id and last_date is not null;
+		if m>0 then
+            begin
+                select cid,cname,address,city,pincode into cno,name,add,ct,pin from consumer where cid=id;
+		select mid,current_reading,previous_reading into meterno,cr,pr from meter where c_idm=id;
+		select bid,units,amount,last_date into bno,unt,amt,ld from amount where c_ida=id;
+		dbms_output.put_line('================================='); 
+		dbms_output.put_line(' electricity bill'); 
+		dbms_output.put_line('================================='); 
+		dbms_output.put_line('bill no.  : '||bno);
+		dbms_output.put_line('consumer id : '||cno);
+		dbms_output.put_line('name : '||name);
+		dbms_output.put_line('address : '||add);
+		dbms_output.put_line('city : '||ct);
+		dbms_output.put_line('zipcode : '||pin);
+		dbms_output.put_line('meter no. : '||meterno);
+		dbms_output.put_line('previous month reading : '||pr);
+		dbms_output.put_line('current month reading : '||cr);
+		dbms_output.put_line('units consumed : '||unt);
+		dbms_output.put_line('amount : '||amt);
+		dbms_output.put_line('last date of payment : '||ld);
+		dbms_output.put_line('=================================');
+	    end;
+		else
+			dbms_output.put_line('bill not generated yet.');
+		end if;
+	end;
+	else 
+		dbms_output.put_line('consumer id not found');
+	end if;
+end;
+/
+111
+exec showbill;
+
+e) create a procedure for payment of bill where consumer id and amount is taken as input.
+
+create or replace procedure paybill 
+as 
+cno consumer.cid%type;
+name consumer.cname%type;
+amnt number;
+amt number;
+du number; 
+ld date; 
+sts char(6); 
+days number; 
+begin
+cno:=&cno;
+amt:=&amt;
+select cname into name from consumer where cid=cno;
+select due, status, last_date,amount into du, sts, ld, amnt from amount where c_ida = cno; 
+if sts = 'n' or sts = 'n' then 
+	days := round(sysdate-ld);
+	if days < 1 then
+		if amt-du=0 then
+			update amount set due=0, status='y' where c_ida=cno;
+			dbms_output.put_line('============================='); 
+			dbms_output.put_line(' bill receipt'); 
+			dbms_output.put_line('============================='); 
+			dbms_output.put_line('id : '||cno); 
+			dbms_output.put_line('name : '||name); 
+			dbms_output.put_line('pay date : '||sysdate); 
+			dbms_output.put_line('amount paid : '||amt);
+			dbms_output.put_line('=================================='); 
+		else
+ 			dbms_output.put_line('not sufficient amount entered');
+		end if;
+	elsif days > 0 and days < 31 then 
+		update amount set due=amnt+100 where c_ida=cno;
+		select due into du from amount where c_ida=cno;
+		if amt-du=0 then
+			update amount set due=0, status='y' where c_ida=cno;
+			dbms_output.put_line('============================='); 
+			dbms_output.put_line(' bill receipt'); 
+			dbms_output.put_line('============================='); 
+			dbms_output.put_line('id : '||cno); 
+			dbms_output.put_line('name : '||name); 
+			dbms_output.put_line('pay date : '||sysdate);
+			dbms_output.put_line('amount paid with penalty : '||amt); 
+			dbms_output.put_line('=================================='); 
+		else
+ 			dbms_output.put_line('not sufficient amount entered, pay with penalty of rs.100, due date exceeded!!!');
+		end if; 
+	else 
+		dbms_output.put_line('======================='); 
+		dbms_output.put_line('your connection has been suspended!!!'); 
+		dbms_output.put_line('-------------------------------------');
+		dbms_output.put_line('contact office.'); 
+		dbms_output.put_line('======================='); 
+	end if; 
+end if;
+ 
+if sts = 'y' or sts = 'y' then 
+	dbms_output.put_line('================================='); 
+	dbms_output.put_line('you have already paid the bill...'); 
+	dbms_output.put_line('================================='); 
+end if; 
+end; 
+/
+111
+413
+exec paybill;
+
+f) create a procedure to delete a record of consumer where consumer id is taken as input.
+
+create or replace procedure dconsumer 
+as
+cno consumer.cid%type;
+begin
+cno:=&cno;
+delete from amount where c_ida=cno;
+delete from meter where c_idm=cno;
+delete from consumer where cid=cno;
+end;
+/
+111
+exec dconsumer;
+
+
+--trigger to auto generate bill number
+
+create or replace trigger vautogbid
+before insert on amount 
+for each row
+declare 
+cnt  number(7);
+cursor bill is select * from amount;
+data amount%rowtype;
+begin
+cnt:=12101;
+         for data in bill loop
+           cnt:=cnt+1;
+        end loop;
+  :new.bid:=cnt;
+end;
+/
+
+--trigger for mobile no.
+
+create or replace trigger vmob
+before insert or update
+on consumer
+for each row
+begin
+	if :new.pno<7000000000 or :new.pno>9999999999 then
+	raise_application_error(-20120,'mobile no. entry is invalid');
+	end if;
+end;
+/
+
+--trigger for date of birth correct choice
+
+create or replace trigger vdob
+before insert or update
+on consumer
+for each row
+begin
+	if :new.dob>sysdate then
+	raise_application_error(-20121,'date of birth must be less then current date');
+	end if;
+end;
+/
+
+--trigger for age correct choice
+
+create or replace trigger vage
+before insert or update
+on consumer
+for each row
+begin
+	if :new.age<18 then
+	raise_application_error(-20121,'age must be greater than 18');
+	end if;
+end;
+/
